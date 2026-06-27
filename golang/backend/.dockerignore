@@ -1,0 +1,17 @@
+# Secrets
+.env.production
+.env
+
+# Git
+.git
+.gitignore
+*.md
+
+# Go build cache
+golang/backend/vendor/
+golang/backend/*.test
+golang/backend/*.out
+
+# Docker files (not needed inside the image)
+docker-compose.yml
+Dockerfile

@@ -1,0 +1,43 @@
+# Runs the compiled service-platform-express app directly on the host
+# (no Docker), as a single Node process (no PM2/cluster mode — see
+# DEPLOY.md if you want to scale across CPU cores later via multiple
+# systemd instances or a process manager instead).
+#
+# Install: copy to /etc/systemd/system/service-platform-express.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now service-platform-express
+#
+# Assumes:
+#   - `npm run build` has been run, producing dist/
+#   - `npm ci --omit=dev` has been run, producing a production-only
+#     node_modules/
+#   - a real .env file with DATABASE_URL exists at
+#     /opt/service-platform-express/.env
+#   - a dedicated, unprivileged "serviceplatform" user/group owns that
+#     directory — this unit never runs as root
+
+[Unit]
+Description=service-platform-express API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=serviceplatform
+Group=serviceplatform
+WorkingDirectory=/opt/service-platform-express
+EnvironmentFile=/opt/service-platform-express/.env
+ExecStart=/usr/bin/node dist/main.js
+Restart=on-failure
+RestartSec=2
+
+# Hardening — deny capabilities the process has no legitimate reason
+# to use, regardless of whether the app itself is well-behaved.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/service-platform-express
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,39 @@
+# Runs the service-platform binary directly on the host (no Docker).
+# Install: copy to /etc/systemd/system/service-platform.service, then
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now service-platform
+#
+# Assumes:
+#   - the release binary has been built and copied to
+#     /opt/service-platform/service-platform (see DEPLOY.md)
+#   - a real .env file with DATABASE_URL exists at
+#     /opt/service-platform/.env
+#   - a dedicated, unprivileged "serviceplatform" user/group owns that
+#     directory (created in DEPLOY.md) — this unit never runs as root
+
+[Unit]
+Description=service-platform Rust API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=serviceplatform
+Group=serviceplatform
+WorkingDirectory=/opt/service-platform
+EnvironmentFile=/opt/service-platform/.env
+ExecStart=/opt/service-platform/service-platform
+Restart=on-failure
+RestartSec=2
+
+# Hardening — none of these are required for the app to function;
+# they just deny capabilities the binary has no legitimate reason to
+# use, so a bug or compromise in a dependency has less to work with.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/service-platform
+
+[Install]
+WantedBy=multi-user.target

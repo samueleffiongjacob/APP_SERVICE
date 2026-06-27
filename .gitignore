@@ -1,0 +1,98 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# Environment and secrets
+.env
+.env.*
+*.local
+
+# Node.js / frontend
+node_modules/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+.turbo/
+.parcel-cache/
+dist/
+coverage/
+playwright-report/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.venv/
+venv/
+env/
+ENV/
+.coverage
+.coverage.*
+htmlcov/
+pip-wheel-metadata/
+.ipynb_checkpoints/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Java
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+.classpath
+.project
+.settings/
+hs_err_pid*
+replay_pid*
+
+# C# / .NET
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.pdb
+*.mdb
+
+# Rust
+debug/
+release/
+*.rs.bk
+*.pdb
+rustc-ice-*.txt
+**/mutants.out*/
+
+# PHP / Composer
+vendor/
+composer.phar
+storage/logs/*.log
+storage/*.key
+bootstrap/cache/*.php

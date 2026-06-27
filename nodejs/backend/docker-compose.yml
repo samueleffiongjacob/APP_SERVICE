@@ -1,0 +1,68 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+        POSTGRES_USER: ${POSTGRES_USER:-postgres}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+        POSTGRES_DB: ${POSTGRES_DB:-service_platform}
+    volumes:
+        - pgdata:/var/lib/postgresql/data
+      # Not published to the host by default — only the `app` service
+      # needs to reach Postgres. Uncomment to connect a local GUI client:
+      # ports:
+      #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-service_platform}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        # Waits for the healthcheck to pass, not just for the
+        # container to start — Postgres takes a moment after start to
+        # actually accept connections, and a bare `depends_on: [db]`
+        # would let the app race ahead and fail its first connection.
+        condition: service_healthy
+    environment:
+      # POSTGRES_* values here must match whatever was
+      # actually set in the Rust project's .env when its `db`
+      # container was created (these are just this file's own
+      # defaults/fallbacks, not the source of truth).
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-service_platform}
+      PORT: 8084
+      NODE_ENV: production
+    networks:
+      - service_platform_net
+    ports:
+      - "${APP_PORT:-8084}:8084"
+
+volumes:
+  pgdata:
+
+# This project does NOT define its own `db` service. Both services are
+# meant to share one Postgres instance and its data — running a second
+# `db` container here would create an empty, divergent database instead
+# of actually sharing state with the Rust service.
+#
+# `external: true` means "join a network created elsewhere, don't
+# create your own." The Rust project's docker-compose.yml is what
+# actually creates `service_platform_net` and the `db` container on it.
+# Start that stack first:
+#   cd ../service-platform && docker compose up -d
+# THEN start this one:
+#   cd ../service-platform-express && docker compose up -d --build
+# Starting this one first will fail with a "network not found" error —
+# that's expected, not a bug; it just means the Rust stack needs to run
+# at least once first to create the shared network and the db.
+networks:
+  service_platform_net:
+    name: service_platform_net
+    external: true

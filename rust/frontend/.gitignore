@@ -1,0 +1,11 @@
+node_modules/
+.next/
+dist/
+target/
+bin/
+obj/
+vendor/
+__pycache__/
+.env
+.env.*
+coverage/

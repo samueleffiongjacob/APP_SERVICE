@@ -1,0 +1,14 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.git/
+.gitignore
+.env
+.env.production
+*.log
+.DS_Store
+docker/
+DEPLOY.md
+README.md

@@ -1,0 +1,23 @@
+# Build artifacts — huge, and the Dockerfile builds fresh inside the
+# container anyway. Including this would bloat the build context by
+# gigabytes for no benefit.
+target/
+
+# Local-only secrets — never let these end up baked into an image layer.
+.env
+.env.*
+!.env.example
+
+# Editor/OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Version control
+.git/
+.gitignore
+
+# Docs not needed inside the image
+*.md
+DEPLOY.md

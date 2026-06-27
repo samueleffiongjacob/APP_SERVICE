@@ -1,0 +1,74 @@
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: service_platform_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Go API ──────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: service_platform_api
+    restart: unless-stopped
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      PORT: ${PORT}
+      DB_HOST: postgres          # matches the service name above
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      postgres:
+        condition: service_healthy  # waits for postgres to be ready
+
+volumes:
+  postgres_data:
+
+
+# ── Go API + Nginx (single container, supervisor manages both) ───────────────
+#   api:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: service_platform_api
+#     restart: unless-stopped
+#     env_file: .env.production
+#     environment:
+#       PORT:        ${PORT}
+#       DB_HOST:     postgres
+#       DB_PORT:     5432
+#       DB_USER:     ${DB_USER}
+#       DB_PASSWORD: ${DB_PASSWORD}
+#       DB_NAME:     ${DB_NAME}
+#     ports:
+#       - "80:80"
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#     networks:
+#       - backend_net
+
+# networks:
+#   backend_net:
+#     driver: bridge
+
+# volumes:
+#   postgres_data:

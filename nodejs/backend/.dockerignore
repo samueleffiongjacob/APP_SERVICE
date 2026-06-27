@@ -1,0 +1,25 @@
+# Build artifacts — the Dockerfile builds dist/ fresh inside the
+# container, and node_modules gets reinstalled there too (host
+# node_modules may contain native bindings built for the wrong
+# platform/arch, which is a classic source of "works on my machine").
+node_modules/
+dist/
+
+# Local-only secrets
+.env
+.env.*
+!.env.example
+
+# Editor/OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Version control
+.git/
+.gitignore
+
+# Docs not needed inside the image
+*.md
+DEPLOY.md

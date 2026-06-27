@@ -1,0 +1,17 @@
+# Environment — never commit real credentials
+.env
+
+# Go build output
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/backend
+
+# Test cache
+*.test
+*.out
+
+# Go module download cache
+vendor/
