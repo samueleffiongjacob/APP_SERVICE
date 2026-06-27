@@ -4,7 +4,6 @@ This workspace is organized as a clean monorepo-style scaffold for seven backend
 
 ## Layout
 
-- `shared/frontend/` - Next.js + TypeScript frontend used by every stack
 - `java/backend/` - Spring Boot backend
 - `csharp/backend/` - ASP.NET Core backend
 - `golang/backend/` - Go backend
